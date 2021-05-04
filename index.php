@@ -4,6 +4,7 @@ require_once 'vendor/autoload.php';
 require 'buttons.html';
 
 use Monolog\Handler\BrowserConsoleHandler;
+use Monolog\Handler\FilterHandler;
 use Monolog\Handler\NativeMailerHandler;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
@@ -11,10 +12,15 @@ use Monolog\Handler\StreamHandler;
 
 // create a log channel
 $log = new Logger('test');
+$info_stream_handler = new StreamHandler('path/to/info.log', Logger::INFO);
+$warning_stream_handler = new StreamHandler('path/to/warning.log', Logger::WARNING);
+$emergency_stream_handler = new StreamHandler('path/to/emergency.log', Logger::EMERGENCY);
+$info_filter_handler = new FilterHandler($info_stream_handler, Logger::DEBUG, Logger::INFO);
 
-$log->pushHandler(new StreamHandler('path/to/info.log', Logger::INFO));
-$log->pushHandler(new StreamHandler('path/to/warning.log', Logger::WARNING));
-$log->pushHandler(new StreamHandler('path/to/emergency.log', Logger::EMERGENCY));
+
+$log->pushHandler($info_filter_handler);
+$log->pushHandler($warning_stream_handler);
+$log->pushHandler($emergency_stream_handler);
 
 // add records to the log
 if (isset($_GET['message']) && isset($_GET['type'])) {
